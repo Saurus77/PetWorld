@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetWorld.Application.Abstractions.AI
+namespace PetWorld.Application.Agents
 {
     public class CriticResult
     {
-        public bool Approved { get; init; }
-        public string Feedback { get; init; } = string.Empty;
+        public bool Approved { get; set; }
+        public string Feedback { get; set; } = string.Empty;
     }
 }

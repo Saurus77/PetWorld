@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetWorld.Infrastructure.Persistance
+namespace PetWorld.Application.Services
 {
-    internal class PetWorldDbContext
+    public interface IChatService
     {
+        Task<ChatResponse> AskAsync(string question);
     }
 }

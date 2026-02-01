@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PetWorld.Application.Abstractions.AI
+namespace PetWorld.Application.Agents
 {
     public interface ICriticAgent
     {
-        Task<CriticResult> CritiqueAsync(string userQuestion, string Answer);
+        Task<CriticResult> EvaluateAsync(
+            string question,
+            string answer);
     }
 }

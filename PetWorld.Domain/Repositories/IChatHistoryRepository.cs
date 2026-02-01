@@ -10,10 +10,10 @@ namespace PetWorld.Domain.Repositories
     // Interfejs repozytorium historii czatu
     public interface IChatHistoryRepository
     {
-        // Zapisuje sesję czatu asynchronicznie
-        Task SaveAsync(ChatSession session);
+        // Dodaje nową sesję czatu asynchronicznie
+        Task AddAsync(ChatHistoryEntry session);
 
-        // Pobiera wszystkie sesje czatu jako listę tylko do odczytu asynchronicznie
-        Task<IReadOnlyList<ChatSession>> GetAllAsync();
+        // Pobiera wszystkie wpisy historii czatu jako listę tylko do odczytu asynchronicznie
+        Task<IReadOnlyList<ChatHistoryEntry>> GetAllAsync();
     }
 }
