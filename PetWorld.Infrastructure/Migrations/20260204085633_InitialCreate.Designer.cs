@@ -12,7 +12,7 @@ using PetWorld.Infrastructure.Data;
 namespace PetWorld.Infrastructure.Migrations
 {
     [DbContext(typeof(PetWorldDbContext))]
-    [Migration("20260204034909_InitialCreate")]
+    [Migration("20260204085633_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -58,18 +58,18 @@ namespace PetWorld.Infrastructure.Migrations
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasColumnType("DECIMAL(18,2)");
 
                     b.HasKey("Id");
 
