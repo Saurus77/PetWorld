@@ -29,7 +29,7 @@ Aplikacja jest zbudowana w oparciu o **Blazor Server**, **Clean Architecture / O
 
 ## Technologie
 
-- **Back-end:** .NET 7, C#, ASP.NET Core, Clean Architecture
+- **Back-end:** .NET 7 (Blazor), .NET 8.0, C#, ASP.NET Core, Clean Architecture
 - **Front-end:** Blazor Server
 - **Baza danych:** MySQL
 - **AI:** Microsoft Agent Framework, OpenAI GPT-3.5
