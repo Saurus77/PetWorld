@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PetWorld.Infrastructure.Data;
-using PetWorld.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using PetWorld.Domain.Entities;
 using PetWorld.Domain.Repositories;
+using PetWorld.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace PetWorld.Infrastructure.Repositories
 {
     public class ChatHistoryRepository : IChatHistoryRepository
     {
-        private readonly PetWorldDbContext _dbContext;
-
-        public ChatHistoryRepository(PetWorldDbContext dbContext)
+        private readonly PetWorldDbContext _context;
+        public ChatHistoryRepository(PetWorldDbContext context)
         {
-            _dbContext = dbContext;
+            _context = context;
         }
 
         public async Task AddAsync(ChatHistoryEntry entry)
         {
-            _dbContext.ChatHistory.Add(entry);
-            await _dbContext.SaveChangesAsync();
+            _context.ChatHistory.Add(entry);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<IReadOnlyList<ChatHistoryEntry>> GetAllAsync()
-        {
-            return await _dbContext.ChatHistory.AsNoTracking().ToListAsync();
-        }
-
+        public async Task<IReadOnlyList<ChatHistoryEntry>> GetAllAsync() =>
+            await _context.ChatHistory
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
     }
 }

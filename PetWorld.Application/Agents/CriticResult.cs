@@ -10,5 +10,13 @@ namespace PetWorld.Application.Agents
     {
         public bool Approved { get; set; }
         public string Feedback { get; set; } = string.Empty;
+
+        protected CriticResult() { }
+
+        public CriticResult(bool approved, string feedback)
+        {
+            Approved = approved;
+            Feedback = feedback;
+        }
     }
 }

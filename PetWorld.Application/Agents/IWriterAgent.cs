@@ -9,7 +9,7 @@ namespace PetWorld.Application.Agents
 {
     public interface IWriterAgent
     {
-        Task<string> GenerateAnswerAsync(
+        Task<WriterResult> GenerateAnswerAsync(
             string question,
             IReadOnlyList<Product> products,
             string? criticFeedback = null);

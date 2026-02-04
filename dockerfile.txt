@@ -1,0 +1,38 @@
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /app
+
+# Copy solution file
+COPY *.sln ./
+
+# Copy project csproj files
+COPY PetWorld.Web/*.csproj ./PetWorld.Web/
+COPY PetWorld.Application/*.csproj ./PetWorld.Application/
+COPY PetWorld.Domain/*.csproj ./PetWorld.Domain/
+COPY PetWorld.Infrastructure/*.csproj ./PetWorld.Infrastructure/
+
+# Restore dependencies
+RUN dotnet restore
+
+# Copy all project files
+COPY . .
+
+# Publish Web app
+RUN dotnet publish PetWorld.Web/PetWorld.Web.csproj -c Release -o /app/publish
+
+# Stage 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+WORKDIR /app
+
+# Copy published output
+COPY --from=build /app/publish .
+
+# Set environment variables
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_URLS=http://+:80
+
+# Expose port
+EXPOSE 80
+
+# Start the app
+ENTRYPOINT ["dotnet", "PetWorld.Web.dll"]

@@ -1,51 +1,50 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using PetWorld.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using PetWorld.Application.Agents;
 using PetWorld.Application.Orchestration;
 using PetWorld.Application.Services;
+using PetWorld.Domain.Repositories;
+using PetWorld.Infrastructure;
+using PetWorld.Infrastructure.Agents;
 using PetWorld.Infrastructure.Data;
 using PetWorld.Infrastructure.Repositories;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using PetWorld.Domain.Repositories;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContext
+var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+             ?? throw new InvalidOperationException("OPENAI_API_KEY environment variable is not set.");
+
+
+// DbContext + DI
 builder.Services.AddDbContext<PetWorldDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    new MySqlServerVersion(new Version(8, 0, 33))));
+                     new MySqlServerVersion(new Version(8, 0, 33)),
+                     mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+                         maxRetryCount: 5,
+                         maxRetryDelay: TimeSpan.FromSeconds(10),
+                         errorNumbersToAdd: null))
+    );
 
-// Repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
-
-// Application Services
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IChatHistoryService, ChatHistoryService>();
+builder.Services.AddScoped<IWriterAgent, WriterAgent>();
+builder.Services.AddScoped<ICriticAgent, CriticAgent>();
 builder.Services.AddScoped<WriterCriticOrchestrator>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
-// AI Agents
-//builder.Services.AddScoped<IWriterAgent, WriterAgent>();
-//builder.Services.AddScoped<ICriticAgent, CriticAgent>();
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// Initialize DB with products
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Error");
+    var context = scope.ServiceProvider.GetRequiredService<PetWorldDbContext>();
+    await DbInitializer.InitializeAsync(context);
 }
-
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

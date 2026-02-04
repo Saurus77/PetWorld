@@ -8,8 +8,6 @@ namespace PetWorld.Application.Agents
 {
     public interface ICriticAgent
     {
-        Task<CriticResult> EvaluateAsync(
-            string question,
-            string answer);
+        Task<CriticResult> EvaluateAsync(string question, string answer);
     }
 }

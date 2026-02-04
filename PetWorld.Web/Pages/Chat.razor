@@ -1,0 +1,29 @@
+﻿@page "/chat"
+@inherits ChatBase
+
+<h3>PetWorld Chat</h3>
+
+<div class="mb-3">
+    <textarea @bind="UserQuestion" class="form-control" placeholder="Wpisz swoje pytanie..." rows="3"></textarea>
+</div>
+
+<button class="btn btn-primary" @onclick="SendQuestion" disabled="@IsProcessing">
+    @if (IsProcessing)
+    {
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span class="sr-only">Przetwarzanie...</span>
+    }
+    else
+    {
+        <span>Wyślij pytanie</span>
+    }
+</button>
+
+@if (ResponseText != null)
+{
+    <div class="mt-3 p-3 border rounded bg-light">
+        <strong>Odpowiedź:</strong>
+        <p>@ResponseText</p>
+        <small>Liczba iteracji: @IterationCount</small>
+    </div>
+}

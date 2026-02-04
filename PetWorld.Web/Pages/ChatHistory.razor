@@ -1,0 +1,33 @@
+﻿@page "/chathistory"
+@inherits ChatHistoryBase
+
+<h3>Historia czatu</h3>
+
+@if (History == null)
+{
+    <p><em>Ładowanie...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Czas</th>
+                <th>Pytanie</th>
+                <th>Odpowiedź</th>
+                <th>Iteracje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in History)
+            {
+                <tr>
+                    <td>@entry.CreatedAt.ToLocalTime()</td>
+                    <td>@entry.Question</td>
+                    <td>@entry.Answer</td>
+                    <td>@entry.Iterations</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using PetWorld.Application.Agents;
+using PetWorld.Application.Services;
+using PetWorld.Domain.Entities;
 using PetWorld.Domain.Repositories;
 
 namespace PetWorld.Application.Orchestration
@@ -15,42 +15,53 @@ namespace PetWorld.Application.Orchestration
         private readonly IWriterAgent _writer;
         private readonly ICriticAgent _critic;
         private readonly IProductRepository _productRepository;
+        private readonly IChatHistoryService _chatHistoryService;
 
         public WriterCriticOrchestrator(
             IWriterAgent writer,
             ICriticAgent critic,
-            IProductRepository productRepository)
+            IProductRepository productRepository,
+            IChatHistoryService chatHistoryService)
         {
             _writer = writer;
             _critic = critic;
             _productRepository = productRepository;
+            _chatHistoryService = chatHistoryService;
         }
 
-        public async Task<(string Answer, int Iterations)> ExecuteAsync(string question)
+        public async Task<ChatHistoryEntry> ExecuteAsync(string question)
         {
             var products = await _productRepository.GetAllAsync();
             string? feedback = null;
-            string answer = string.Empty;
+            string finalAnswer = string.Empty;
+            int iterationCount = 0;
 
-            for (int iteration = 1; iteration <= MaxIterations; iteration++)
+            for (iterationCount = 1; iterationCount <= MaxIterations; iterationCount++)
             {
-                answer = await _writer.GenerateAnswerAsync(
-                    question,
-                    products,
-                    feedback);
+                // Wywołanie Writer
+                var writerResult = await _writer.GenerateAnswerAsync(question, products, feedback);
+                finalAnswer = writerResult.Answer;
 
-                var critique = await _critic.EvaluateAsync(
-                    question,
-                    answer);
+                // Wywołanie Critic
+                var critique = await _critic.EvaluateAsync(question, finalAnswer);
 
                 if (critique.Approved)
-                {
-                    return (answer, iteration);
-                }
+                    break;
 
                 feedback = critique.Feedback;
             }
-            return (answer, MaxIterations);
+
+            // Zapis do historii czatu
+            var chatEntry = new ChatHistoryEntry
+            (
+                question,
+                finalAnswer,
+                iterationCount
+            );
+
+            await _chatHistoryService.AddAsync(chatEntry);
+
+            return chatEntry;
         }
     }
 }

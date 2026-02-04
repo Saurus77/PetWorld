@@ -1,0 +1,25 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: petworld
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: PetWorld.Web/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      ConnectionStrings__DefaultConnection: "server=mysql;port=3306;database=petworld;user=root;password=password"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}

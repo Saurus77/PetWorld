@@ -1,26 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
 using PetWorld.Domain.Entities;
 
-namespace PetWorld.Infrastructure.Data
+namespace PetWorld.Infrastructure.Data;
+
+public class PetWorldDbContext : DbContext
 {
-    public class PetWorldDbContext : DbContext
+    public PetWorldDbContext(DbContextOptions<PetWorldDbContext> options)
+        : base(options) { }
+
+    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<ChatHistoryEntry> ChatHistory { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        public PetWorldDbContext(DbContextOptions<PetWorldDbContext> options)
-            : base(options) { }
+        base.OnModelCreating(modelBuilder);
 
-        public DbSet<Product> Products { get; set; } = null!;
-        public DbSet<ChatHistoryEntry> ChatHistory { get; set; } = null!;
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        modelBuilder.Entity<ChatHistoryEntry>(builder =>
         {
-            base.OnModelCreating(modelBuilder);
-        }
-        
+            builder.HasKey(e => e.Id);
+            builder.Property(e => e.Question)
+                   .IsRequired()
+                   .HasColumnType("TEXT");  // Avoid truncation
+            builder.Property(e => e.Answer)
+                   .IsRequired()
+                   .HasColumnType("TEXT");  // Avoid truncation
+            builder.Property(e => e.CreatedAt)
+                   .IsRequired()
+                   .HasColumnType("DATETIME");
+        });
     }
 }
